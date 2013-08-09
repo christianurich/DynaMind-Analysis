@@ -3,19 +3,11 @@ DynaMind-Analysis
 
 
 
-<!DOCTYPE html>
-<html>
-<head>
-  <title>DynaMind Results</title>
-	<meta charset="utf-8" />
-
+<body>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
 	<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
   	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-</head>
-
-<body>
 	<form id="states">
 	  <label for="state">States</label>
 	  <select name="state" id="state">
@@ -62,5 +54,5 @@ DynaMind-Analysis
 		    });
 	  	});
 	</script>
-</body>
+
 </html>
