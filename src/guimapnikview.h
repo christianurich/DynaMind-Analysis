@@ -5,19 +5,20 @@
 //QT
 #include <QWidget>
 #include <QMap>
+#include <mapnikrenderer.h>
 
 
-struct style_struct {
-    QString layer;
-    QString symbolizer;
-    QString name;
-    QString buildingHeight;
-    QString filter;
-    QColor color;
-    double linewidth;
-    double opacity;
+//struct style_struct {
+//    QString layer;
+//    QString symbolizer;
+//    QString name;
+//    QString buildingHeight;
+//    QString filter;
+//    QColor color;
+//    double linewidth;
+//    double opacity;
 
-};
+//};
 
 namespace DM {
     class System;

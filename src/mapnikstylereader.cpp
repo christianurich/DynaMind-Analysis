@@ -1,11 +1,10 @@
 #include "dmlogger.h"
-
 #include "mapnikstylereader.h"
 
 
 
-MapnikStyleReader::MapnikStyleReader(QString file, GUIMapnikView * mv) :
-    mv(mv)
+MapnikStyleReader::MapnikStyleReader(QString file, MapnikRenderer * mv) :
+	mv(mv)
 {
 
     QXmlSimpleReader r;

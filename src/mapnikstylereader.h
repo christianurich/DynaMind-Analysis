@@ -2,13 +2,12 @@
 #define MAPNIKSTYLEREADER_H
 
 #include <QXmlSimpleReader>
-
-#include "guimapnikview.h"
+#include <mapnikrenderer.h>
 
 class MapnikStyleReader : public QXmlDefaultHandler
 {
 private:
-    GUIMapnikView * mv;
+	MapnikRenderer * mv;
     QMap<QString, style_struct> styles;
 
     QString currentLayer;
@@ -18,7 +17,7 @@ private:
 
     QString tempval;
 public:
-    MapnikStyleReader(QString FileName, GUIMapnikView * mv);
+	MapnikStyleReader(QString FileName, MapnikRenderer * mv);
     virtual ~MapnikStyleReader(){}
     bool startElement(const QString & namespaceURI,
                       const QString & localName,

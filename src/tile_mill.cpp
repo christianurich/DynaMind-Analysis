@@ -1,53 +1,78 @@
 #include "tile_mill.h"
 
 #include <QDir>
+#include <guitillmill.h>
 
 #include <cmath>
 
 #include <dmsystem.h>
 #include <mapnikrenderer.h>
 
+
 DM_DECLARE_NODE_NAME( TileMill,Viewer )
 
 TileMill::TileMill()
 {
-
-	this->viewName = "";
+	global_counter = -1;
 	this->maxZoomLevel = 1;
-
-	this->addParameter("ViewName", DM::STRING, &viewName);
+	this->addParameter("ExportMaps", DM::STRING_MAP, &exportMaps);
+	this->addParameter("Styles", DM::STRING_MAP, &styles);
 	std::vector<DM::View> datastream;
 	datastream.push_back(DM::View("dummy", DM::SUBSYSTEM, DM::READ));
-
 	this->addParameter("ZoomLevels", DM::INT, &maxZoomLevel);
-
 	this->addData("data",datastream);
-
 }
 
 void TileMill::init()
 {
-	if (viewName.empty()) return;
+	if (exportMaps.size() == 0) return;
 
-	DM::View v = this->getViewInStream("data", viewName);
-	if (v.getType() == -1) {
-		Logger(Error) << "View does not exist";
-		return;
+	for (std::map<std::string, std::string>::const_iterator it = exportMaps.begin();
+		 it != exportMaps.end();
+		 ++it) {
+		std::string name = it->second;
+		DM::View v = this->getViewInStream("data", it->second);
+		if (v.getType() == -1) {
+			Logger(Error) << "View " << name << " does not exist";
+			return;
+		}
 	}
 
 	std::vector<DM::View> datastream;
-	vData = DM::View(viewName, v.getType(), v.getType());
+	for (std::map<std::string, std::string>::const_iterator it = exportMaps.begin();
+		 it != exportMaps.end();
+		 ++it) {
+		std::string name = it->second;
+		DM::View v = this->getViewInStream("data", name);
+		vData = DM::View(name, v.getType(), DM::READ);
+	}
 	datastream.push_back(vData);
-
 	this->addData("data", datastream);
 }
 
 void TileMill::run() {
+	global_counter++;
+
 	DM::System * sys = this->getData("data");
 	MapnikRenderer tilemill = MapnikRenderer(sys);
-	tilemill.addLayer(QString::fromStdString(viewName));
+	for (std::map<std::string, std::string>::const_iterator it = exportMaps.begin();
+		 it != exportMaps.end();
+		 ++it) {
+		std::string name = it->second;
+		if (styles.find(it->first) == styles.end()) {
+			tilemill.addLayer(QString::fromStdString(name));
+			continue;
+		}
+
+		QString filename = QString::fromStdString(styles[it->first]);
+		tilemill.loadStyle(filename);
+
+	}
 	QString rootdir("/tmp/test");
 	QDir root = QDir(rootdir);
+	//Add current state to root dir
+	rootdir =rootdir + "/"+QString::number(global_counter);
+	root.mkdir(rootdir);
 	for (int zoomlevel = 0; zoomlevel <this->maxZoomLevel ; zoomlevel++) {
 		QString z_dir = rootdir + "/"+ QString::number(zoomlevel);
 		root.mkdir(z_dir);
@@ -63,6 +88,13 @@ void TileMill::run() {
 			}
 		}
 	}
+}
+
+
+bool TileMill::createInputDialog() {
+	//QWidget * w = new GUITillMill(this);
+	//w->show();
+	return false;
 }
 
 

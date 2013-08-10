@@ -32,6 +32,8 @@
 #include <mapnik/raster_colorizer.hpp>
 
 
+#include <mapnikstylereader.h>
+
 using namespace mapnik;
 
 struct mapnik_private {
@@ -423,6 +425,11 @@ void MapnikRenderer::renderGrid(unsigned dx, unsigned dy, QString filename)
 	ren.apply();
 
 	save_to_file(buf,filename.toStdString(),"png");
+}
+
+void MapnikRenderer::loadStyle(QString filename)
+{
+	MapnikStyleReader(filename, this);
 }
 
 void MapnikRenderer::increaseZoomLevel(double factor)

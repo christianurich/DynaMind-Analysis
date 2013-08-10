@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>DynaMind Results</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+  	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+</head>
+
+<body>
+	<form id="states">
+	  <label for="state">Year</label>
+	  <select name="state" id="state">
+	  	<option>2012</option>
+	    <option>2013</option>
+	  	<option>2014</option>
+	    <option>2015</option>
+	  	<option>2016</option>
+	    <option>2017</option>
+	  	<option>2018</option>
+	    <option>2019</option>
+	  	<option>2020</option>
+	    <option>2021</option>
+	  	<option>2022</option>
+	    <option>2023</option>
+	  	<option>2024</option>
+	    <option>2025</option>
+	  	<option>2026</option>
+	    <option>2027</option>
+	  	<option>2028</option>
+	    <option>2029</option>
+	  	<option>2030</option>
+	    <option>2031</option>
+	  </select>
+	</form>
+
+	<div id="map" style="width: 800px; height: 400px"></div>
+
+	<script>
+		var map = L.map('map').setView([0.0, 0.0], 2);
+		var layers = L.tileLayer('data/0/{z}/{x}/{y}.png', {
+			maxZoom: 4,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://dynamind-toolbox.org">DynaMind-Toolbox</a>, Created with <a href=https://github.com/christianurich/DynaMind-Analysis> DynaMind-Analysis </a>'
+		})
+		layers.addTo(map);
+		//Conect Slider
+		 $(function() {
+		    var select = $( "#state" );
+		    $( "#state" ).change(function() {
+
+		       var state_location =  'data/' + (this.selectedIndex) + '/' + '{z}/{x}/{y}.png'
+		       console.log(state_location);		       
+		       layers.setUrl(state_location)
+		    });
+	  	});
+	</script>
+</body>
+</html>

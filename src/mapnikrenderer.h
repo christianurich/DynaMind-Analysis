@@ -53,6 +53,7 @@ public:
 	void changeSystem(DM::System * sys);
 	std::string save_style_to_file();
 	void renderGrid(unsigned dx, unsigned dy, QString filename);
+	void loadStyle(QString filename);
 
 
 private:

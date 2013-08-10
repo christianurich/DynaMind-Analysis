@@ -91,7 +91,7 @@ void GUIMapnikViewer::on_actionLoad_style_triggered()
     if (fileName.isEmpty())
         return;
 
-    MapnikStyleReader mr(fileName, this->ui->widget_mapnik);
+	//MapnikStyleReader mr(fileName, this->ui->widget_mapnik);
 }
 
 void GUIMapnikViewer::on_listWidget_systems_itemActivated(QListWidgetItem * item)
