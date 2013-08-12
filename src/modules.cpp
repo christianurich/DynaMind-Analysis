@@ -25,6 +25,7 @@
  */
 #include "dmnodefactory.h"
 #include "dmmoduleregistry.h"
+#include "exportgeojson.h"
 #include "tile_mill.h"
 
 
@@ -33,6 +34,7 @@ using namespace std;
 extern "C" void DM_HELPER_DLL_EXPORT  registerModules(ModuleRegistry *registry) 
 {
     registry->addNodeFactory(new NodeFactory<TileMill>());
+	registry->addNodeFactory(new NodeFactory<ExportGeoJSON>());
 
 }
 
