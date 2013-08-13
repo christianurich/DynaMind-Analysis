@@ -1,4 +1,7 @@
 #include "mapnikrenderer.h"
+//STD
+#include <stdio.h>
+#include <math.h>
 
 //QT
 #include <QPainter>
@@ -40,14 +43,16 @@ struct mapnik_private {
 	QMap<QString,  boost::shared_ptr<SystemMapnikWrapper> > datasources_;
 };
 
-MapnikRenderer::MapnikRenderer(DM::System * sys) :
+MapnikRenderer::MapnikRenderer(DM::System * sys, int EPSG, int EPSGTo) :
 	sys_(sys),
 	d(new mapnik_private),
 	zoom_level(1.),
 	pan(0,0),
 	startPos(0,0),
 	height(256),
-	width(256)
+	width(256),
+	EPSG(EPSG),
+	EPSGTo(EPSGTo)
 {
 
 	std::string mapnik_dir("/usr/local/Cellar/mapnik/2.2.0/lib");
@@ -56,7 +61,7 @@ MapnikRenderer::MapnikRenderer(DM::System * sys) :
 	DM::Logger(DM::Debug) << " looking for DejaVuSans font in... " << mapnik_dir << "/mapnik/fonts/DejaVuSans.ttf";
 	freetype_engine::register_font(mapnik_dir + "/mapnik/fonts/DejaVuSans.ttf");
 
-//	pan = QPoint(this->height()/2, this->width()/2);
+	//	pan = QPoint(this->height()/2, this->width()/2);
 	map_ = 0;
 	this->init_mapnik();
 }
@@ -83,7 +88,7 @@ void MapnikRenderer::init_mapnik() {
 
 
 	DM::Logger(DM::Debug) << this->width;
-	map_->set_background(color("white"));
+	map_->set_background(color(0,0,0,0));
 
 }
 
@@ -225,7 +230,7 @@ void MapnikRenderer::addLayer(QString dm_layer, bool withdefault)
 		stringstream s_view_type;
 		s_view_type << this->sys_->getViewDefinition(dm_layer.toStdString())->getType();
 		p["view_type"]= s_view_type.str();
-		boost::shared_ptr<SystemMapnikWrapper> ds(new SystemMapnikWrapper(p, true, sys_));
+		boost::shared_ptr<SystemMapnikWrapper> ds(new SystemMapnikWrapper(p, true, sys_, this->EPSG, this->EPSGTo));
 
 
 		d->datasources_[dm_layer] = ds;
@@ -305,7 +310,7 @@ void MapnikRenderer::removeStyleDefinition(QString layer_name, QString stylename
 
 	this->drawMap();
 
-//	emit removedStyle(layer_name, stylename);
+	//	emit removedStyle(layer_name, stylename);
 }
 
 void MapnikRenderer::addNewStyle(style_struct ss)
@@ -369,7 +374,7 @@ void MapnikRenderer::addNewStyle(style_struct ss)
 
 	this->drawMap();
 
-//	emit new_style_added(ss.layer, ss.name);
+	//	emit new_style_added(ss.layer, ss.name);
 }
 
 void MapnikRenderer::saveToPicture(unsigned width, unsigned height, QString filename)
@@ -397,28 +402,59 @@ void MapnikRenderer::saveToPicture(unsigned width, unsigned height, QString file
 	save_to_file(buf,filename.toStdString(),"png");
 }
 
+int MapnikRenderer::minZoomLevel() {
+	if (!sys_)
+		return -1;
+	map_->zoom_all();
+	mapnik::box2d<double> window_extend = map_->get_current_extent();
+
+
+	double length = window_extend[2] - window_extend[0];
+
+	double length_map = 360;
+
+	double difference =  length_map / length;
+
+	return log2(difference);
+
+
+}
+
+mapnik::box2d<double> MapnikRenderer::getMapExtend()
+{
+	map_->zoom_all();
+	return  map_->get_current_extent();
+}
+
+
 
 void MapnikRenderer::renderGrid(unsigned dx, unsigned dy, QString filename)
 {
+
+	double x1_extend = -20037508.342789244;
+	double y1_extend = -20037508.342789244;
+	double x2_extend = 20037508.342789244;
+	double y2_extend = 20037508.342789244;
+
+	double total_length_x = x2_extend - x1_extend;
+	double total_length_y = y2_extend - y1_extend;
+
 	if (!sys_)
 		return;
 	map_->zoom_all();
-	mapnik::box2d<double> window_tot = map_->get_current_extent();
 
-	double length = window_tot[2] - window_tot[0];
-	double segment_length = length * this->zoom_level;
 
-	DM::Logger(DM::Standard) << window_tot[0] << "/" << window_tot[3];
 	map_->set_width(256);
 	map_->set_height(256);
 	mapnik::box2d<double> window;
-	double x1 = segment_length * dx +  window_tot[0];
-	double y1 = segment_length * dy +  window_tot[1];
-	double x2 = segment_length * (dx + 1) +  window_tot[0];
-	double y2 = segment_length * (dy + 1) +  window_tot[1];
+	double x1 =  this->zoom_level * dx * total_length_x +  x1_extend;// +  window_extend[0];
+	double y1 =  total_length_y - this->zoom_level * dy * total_length_x + y1_extend;// +  window_extend[1];
+	double x2 = this->zoom_level * (dx + 1) * total_length_x +  x1_extend;// +  window_extend[0];
+	double y2 =  total_length_y - this->zoom_level * (dy+1) * total_length_x + y1_extend ;// +  window_extend[1];
 
 	window.init(x1,y1,x2,y2);
-	DM::Logger(DM::Standard) << window[0] << "/" << window[3];
+	DM::Logger(DM::Standard) << window[0] << "/" << window[1];
+	DM::Logger(DM::Standard) << window[2] << "/" << window[3];
 	map_->zoom_to_box(window);
 	image_32 buf(map_->width(),map_->height());
 	agg_renderer<image_32> ren(*map_,buf);

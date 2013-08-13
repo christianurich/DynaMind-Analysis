@@ -11,10 +11,14 @@
 // boost
 #include <boost/scoped_ptr.hpp> // needed for wrapping the transcoder
 
+//gdal
+#include <ogrsf_frmts.h>
+#include <gdal_priv.h>
+
 class SystemMapnikFeatureset : public mapnik::Featureset
 {
 public:
-    SystemMapnikFeatureset(mapnik::box2d<double> const& box, std::string const& encoding, DM::System * sys, const DM::View & v);
+	SystemMapnikFeatureset(mapnik::box2d<double> const& box, std::string const& encoding, DM::System * sys, const DM::View & v, int EPSG, int EPSGTo);
 
     // desctructor
     virtual ~SystemMapnikFeatureset();
@@ -22,6 +26,7 @@ public:
     // mandatory: you must expose a next() method, called when rendering
     mapnik::feature_ptr next();
 
+	void initTransformation();
 private:
     // members are up to you, but these are recommended
     mapnik::box2d<double> box_;
@@ -35,8 +40,15 @@ private:
     void draw_edges(DM::Edge *e,  mapnik::feature_ptr feature);
     void draw_node(DM::Node *n,  mapnik::feature_ptr feature);
     void add_attribute(DM::Component * cmp,  mapnik::feature_ptr feature);
+	std::vector<std::string> attribute_list;
+	int EPSG;
+	int EPSGTo;
 
-    std::vector<std::string> attribute_list;
+	OGRCoordinateTransformation * poCT;
+	bool transformok;
+
+	bool transform(double *x, double *y);
+
 
 };
 

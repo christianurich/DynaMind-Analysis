@@ -6,6 +6,8 @@
 #include <QMap>
 #include <QPoint>
 
+#include <mapnik/box2d.hpp>
+
 struct style_struct {
 	QString layer;
 	QString symbolizer;
@@ -33,7 +35,7 @@ class MapnikRenderer
 {
 
 public:
-	MapnikRenderer( DM::System * sys=0);
+	MapnikRenderer(DM::System * sys=0, int EPSG = 0, int EPSGTo = 0);
 	QString getFilterForStyle(QString style);
 	~MapnikRenderer();
 
@@ -54,6 +56,9 @@ public:
 	std::string save_style_to_file();
 	void renderGrid(unsigned dx, unsigned dy, QString filename);
 	void loadStyle(QString filename);
+	int minZoomLevel();
+
+	mapnik::box2d<double> getMapExtend( );
 
 
 private:
@@ -77,9 +82,8 @@ private:
 	/** return index of layer, if not found return value is -1*/
 	int getLayerIndex(std::string layer_name);
 
-
-
-
+	int EPSG;
+	int EPSGTo;
 };
 
 

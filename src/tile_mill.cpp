@@ -8,6 +8,8 @@
 #include <dmsystem.h>
 #include <mapnikrenderer.h>
 
+#include "ogrsf_frmts.h"
+#include "gdal_priv.h"
 
 DM_DECLARE_NODE_NAME( TileMill,Viewer )
 
@@ -15,11 +17,13 @@ TileMill::TileMill()
 {
 	global_counter = -1;
 	this->maxZoomLevel = 1;
+	this->EPSGCode = 0;
 	this->addParameter("ExportMaps", DM::STRING_MAP, &exportMaps);
 	this->addParameter("Styles", DM::STRING_MAP, &styles);
 	std::vector<DM::View> datastream;
 	datastream.push_back(DM::View("dummy", DM::SUBSYSTEM, DM::READ));
 	this->addParameter("ZoomLevels", DM::INT, &maxZoomLevel);
+	this->addParameter("EPSGCode", DM::INT, &EPSGCode);
 	this->addData("data",datastream);
 }
 
@@ -50,11 +54,20 @@ void TileMill::init()
 	this->addData("data", datastream);
 }
 
-void TileMill::run() {
-	global_counter++;
 
+void TileMill::run() {
+	//EPSG 900913
+	double x1_extend = -20037508.342789244;
+	double y1_extend = -20037508.342789244;
+	double x2_extend = 20037508.342789244;
+	double y2_extend = 20037508.342789244;
+
+	double total_length_x = x2_extend - x1_extend;
+	double total_length_y = y2_extend - y1_extend;
+
+	global_counter++;
 	DM::System * sys = this->getData("data");
-	MapnikRenderer tilemill = MapnikRenderer(sys);
+	MapnikRenderer tilemill = MapnikRenderer(sys, this->EPSGCode, 900913);
 	for (std::map<std::string, std::string>::const_iterator it = exportMaps.begin();
 		 it != exportMaps.end();
 		 ++it) {
@@ -66,24 +79,40 @@ void TileMill::run() {
 
 		QString filename = QString::fromStdString(styles[it->first]);
 		tilemill.loadStyle(filename);
-
 	}
+
 	QString rootdir("/tmp/test");
 	QDir root = QDir(rootdir);
 	//Add current state to root dir
 	rootdir =rootdir + "/"+QString::number(global_counter);
 	root.mkdir(rootdir);
-	for (int zoomlevel = 0; zoomlevel <this->maxZoomLevel ; zoomlevel++) {
+
+	Logger(Standard) << tilemill.getMapExtend()[0] << "/" << tilemill.getMapExtend()[1];
+	Logger(Standard) << tilemill.getMapExtend()[2] << "/" << tilemill.getMapExtend()[3];
+
+	int minzoomlevel = log2( total_length_x / (tilemill.getMapExtend()[2] - tilemill.getMapExtend()[0]) );
+	Logger(Standard) << minzoomlevel;
+
+	//for WGS84
+	for (int zoomlevel = minzoomlevel; zoomlevel < minzoomlevel + this->maxZoomLevel ; zoomlevel++) {
+		int elements = pow(2,zoomlevel);
+		Logger(Standard) << elements;
 		QString z_dir = rootdir + "/"+ QString::number(zoomlevel);
 		root.mkdir(z_dir);
-		int number_of_elements = pow (2, zoomlevel);
-		for ( int x = 0; x < (number_of_elements); x++ ) {
+		int total_x =  (tilemill.getMapExtend()[2]  - tilemill.getMapExtend()[0])/total_length_x * elements + 2;
+		int total_y =  (tilemill.getMapExtend()[3]  - tilemill.getMapExtend()[1])/total_length_y * elements + 2;
+		Logger(Standard) << total_x <<"/" << total_y;
+		int offest_x = ( tilemill.getMapExtend()[0] -  x1_extend ) / total_length_x  * elements;
+		int offest_y = ( -tilemill.getMapExtend()[1] - y1_extend ) / total_length_y  * elements;
+		for ( int dx = 0; dx < (total_x); dx++ ) {
+			int x = dx + offest_x;
 			QString x_dir =z_dir + "/"+ QString::number(x);
 			root.mkdir(x_dir);
-			int k = 0;
-			for ( int y = number_of_elements-1; y >=0 ; y--, k++ ) {
-				tilemill.setZoomLevel(1./float(number_of_elements));
-				QString filename = x_dir + "/" + QString::number(k) + ".png";
+			int k = offest_y;
+			for ( int dy = 0; dy < total_y; dy++, k++ ) {
+				int y = offest_y - dy;
+				tilemill.setZoomLevel(1./float(elements));
+				QString filename = x_dir + "/" + QString::number(y) + ".png";
 				tilemill.renderGrid(x,y,filename);
 			}
 		}

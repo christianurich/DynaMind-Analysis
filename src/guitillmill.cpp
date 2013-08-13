@@ -12,10 +12,10 @@ ui(new Ui::GUITillMill)
 {
 	ui->setupUi(this);
 
-	std::vector<std::string> viewnames = m->getParameter<std::vector<std::string> >("ViewNames");
+	/*std::vector<std::string> viewnames = m->getParameter<std::vector<std::string> >("ViewNames");
 	foreach (std::string v, viewnames) {
 		ui->listWidget_view->addItem(QString::fromStdString(v));
-	}
+	}*/
 }
 
 GUITillMill::~GUITillMill()
@@ -42,7 +42,7 @@ void GUITillMill::accept()
 		views.push_back(ui->listWidget_view->item(i)->text().toStdString());
 	}
 
-	this->m->setParameterNative<std::vector<std::string> >("ViewNames", views);
+	//this->m->setParameterNative<std::vector<std::string> >("ViewNames", views);
 
 	QDialog::accept();
 }

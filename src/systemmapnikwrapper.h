@@ -21,7 +21,7 @@
 class SystemMapnikWrapper : public mapnik::datasource
 {
 public:
-    SystemMapnikWrapper(mapnik::parameters const &param,  bool bind=true, DM::System * sys = 0);
+	SystemMapnikWrapper(mapnik::parameters const &param,  bool bind=true, DM::System * sys = 0, int EPSG = 0, int EPGSTo = 0);
 
     virtual ~SystemMapnikWrapper();
 
@@ -70,6 +70,9 @@ private:
     std::string source_type;
     std::string view_name;
     std::string view_type;
+
+	int EPSG;
+	int EPGSTo;
 
 
 
