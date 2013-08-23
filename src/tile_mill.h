@@ -1,7 +1,8 @@
 #ifndef TILEMILL_H
 #define TILEMILL_H
 
-#include "dmmodule.h"
+#include <dmmodule.h>
+#include <dmlogger.h>
 
 using namespace DM;
 

@@ -276,14 +276,15 @@ void MapnikRenderer::editStyleDefintionGUI(QString layer_name)
 	}
 	//Get View embended in the system
 	if (!sys_->getViewDefinition(layer_name.toStdString())) return;
-	DM::Component * cmp = sys_->getViewDefinition(layer_name.toStdString())->getDummyComponent();
-	std::map<std::string, DM::Attribute*> attrs_map =  cmp->getAllAttributes();
+	DM::View *vptr = sys_->getViewDefinition(layer_name.toStdString());
+	//DM::Component * cmp = sys_->getViewDefinition(layer_name.toStdString())->getDummyComponent();
+	//std::map<std::string, DM::Attribute*> attrs_map =  cmp->getAllAttributes();
+
 	QStringList attribute_list;
-	for (std::map<std::string, DM::Attribute*>::const_iterator it = attrs_map.begin();
-		 it != attrs_map.end();
-		 ++it) {
-		attribute_list.append(QString::fromStdString(it->first));
+	foreach ( std::string s, vptr->getAllAttributes()) {
+		attribute_list.append(QString::fromStdString(s));
 	}
+
 	//GUIStyleDefinition * gsd = new GUIStyleDefinition(layer_name, styleNames, attribute_list, this);
 	//connect (gsd, SIGNAL(removeStyle(QString,QString)), this, SLOT(removeStyleDefinition(QString,QString)));
 	//connect (gsd, SIGNAL(newStyle(style_struct)), this, SLOT(addNewStyle(style_struct)));

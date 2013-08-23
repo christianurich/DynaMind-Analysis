@@ -55,14 +55,8 @@ SystemMapnikFeatureset::SystemMapnikFeatureset(mapnik::box2d<double> const& box,
 		DM::Logger(DM::Warning) << "View doesn't exist yet";
 		return;
 	}
-	DM::Component * cmp = sys->getViewDefinition(v.getName())->getDummyComponent();
-	std::map<std::string, DM::Attribute*> attrs_map =  cmp->getAllAttributes();
-
-	for (std::map<std::string, DM::Attribute*>::const_iterator it = attrs_map.begin();
-		 it != attrs_map.end();
-		 ++it) {
-		attribute_list.push_back(it->first);
-	}
+	//DM::Component * cmp = sys->getViewDefinition(v.getName())->getDummyComponent();
+	attribute_list = vptr->getAllAttributes();
 }
 
 SystemMapnikFeatureset::~SystemMapnikFeatureset() { }
