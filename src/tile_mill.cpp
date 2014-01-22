@@ -25,6 +25,8 @@ TileMill::TileMill()
 	this->addParameter("ZoomLevels", DM::INT, &maxZoomLevel);
 	this->addParameter("EPSGCode", DM::INT, &EPSGCode);
 	this->addData("data",datastream);
+	this->folderName = "/tmp";
+	this->addParameter("fileName", DM::STRING, &this->folderName);
 }
 
 void TileMill::init()
@@ -56,6 +58,7 @@ void TileMill::init()
 
 
 void TileMill::run() {
+	Logger(Debug) << "Run TileMill";
 	//EPSG 900913
 	double x1_extend = -20037508.342789244;
 	double y1_extend = -20037508.342789244;
@@ -67,7 +70,9 @@ void TileMill::run() {
 
 	global_counter++;
 	DM::System * sys = this->getData("data");
+	Logger(Debug) << "Init TileMill";
 	MapnikRenderer tilemill = MapnikRenderer(sys, this->EPSGCode, 900913);
+	Logger(Debug) << "Init TileMill Successful";
 	for (std::map<std::string, std::string>::const_iterator it = exportMaps.begin();
 		 it != exportMaps.end();
 		 ++it) {
@@ -81,8 +86,15 @@ void TileMill::run() {
 		tilemill.loadStyle(filename);
 	}
 
-	QString rootdir("/tmp/test");
+	QString rootdir(QString::fromStdString(this->folderName));
+
+	if (!QDir(rootdir).exists()){
+		DM::Logger(DM::Standard) <<  this->folderName << "  does not exist but created";
+		QDir::current().mkpath(rootdir);
+	}
+
 	QDir root = QDir(rootdir);
+
 	//Add current state to root dir
 	rootdir =rootdir + "/"+QString::number(global_counter);
 	root.mkdir(rootdir);

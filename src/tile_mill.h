@@ -16,6 +16,7 @@ class DM_HELPER_DLL_EXPORT TileMill : public DM::Module
 	int maxZoomLevel;
 	int global_counter;
 	int EPSGCode;
+	std::string folderName;
 
     public:
         TileMill();  //Constructor where data and objects for the module are defined
