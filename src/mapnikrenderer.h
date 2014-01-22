@@ -64,7 +64,7 @@ public:
 private:
 	double height;
 	double width;
-	QPixmap pix_;
+	//QPixmap pix_;
 	mapnik::Map * map_;
 	DM::System * sys_;
 

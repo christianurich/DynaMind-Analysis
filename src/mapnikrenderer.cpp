@@ -117,7 +117,7 @@ void MapnikRenderer::drawMap()
 		ren.apply();
 
 		QImage image((uchar*)buf.raw_data(),map_->width(),map_->height(),QImage::Format_ARGB32);
-		pix_ = QPixmap::fromImage(image.rgbSwapped());
+		//pix_ = QPixmap::fromImage(image.rgbSwapped());
 	}
 	catch ( const mapnik::config_error & ex )
 	{
