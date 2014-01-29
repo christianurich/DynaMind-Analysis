@@ -18,6 +18,7 @@ TileMill::TileMill()
 	global_counter = -1;
 	this->maxZoomLevel = 1;
 	this->EPSGCode = 0;
+
 	this->addParameter("ExportMaps", DM::STRING_MAP, &exportMaps);
 	this->addParameter("Styles", DM::STRING_MAP, &styles);
 	std::vector<DM::View> datastream;
@@ -27,6 +28,15 @@ TileMill::TileMill()
 	this->addData("data",datastream);
 	this->folderName = "/tmp";
 	this->addParameter("fileName", DM::STRING, &this->folderName);
+
+	this->currrentZoomLevel = 12;
+	this->addParameter("currrentZoomLevel", DM::INT, &this->currrentZoomLevel);
+	this->centre_x = 47.26;
+	this->addParameter("centre_x", DM::DOUBLE, &this->centre_x);
+	this->centre_y = 11.4;
+	this->addParameter("centre_y", DM::DOUBLE, &this->centre_y);
+
+
 }
 
 void TileMill::init()
@@ -112,8 +122,25 @@ void TileMill::run() {
 
 	int minzoomlevel = log2( total_length_x / (tilemill.getMapExtend()[2] - tilemill.getMapExtend()[0]) );
 	Logger(Debug) << minzoomlevel;
+	this->currrentZoomLevel = minzoomlevel;
 
-	//for WGS84
+	//
+	this->initTransForm(900913,4326);
+
+	double x1 = tilemill.getMapExtend()[0];
+	double y1 = tilemill.getMapExtend()[1];
+	double x2 = tilemill.getMapExtend()[2];
+	double y2 = tilemill.getMapExtend()[3];
+
+	this->transform(&x1, &y1);
+	this->transform(&x2, &y2);
+
+	Logger(Debug) << x1 << "/" << x2;
+	Logger(Debug) << y1 << "/" << y2;
+
+	this->centre_x = x1 + (x2-x1) / 2.;
+	this->centre_y = y1 + (y2-y1) / 2.;
+
 	for (int zoomlevel = minzoomlevel; zoomlevel < minzoomlevel + this->maxZoomLevel ; zoomlevel++) {
 		int elements = pow(2,zoomlevel);
 		Logger(Debug) << elements;
@@ -144,6 +171,40 @@ bool TileMill::createInputDialog() {
 	//QWidget * w = new GUITillMill(this);
 	//w->show();
 	return false;
+}
+
+void TileMill::initTransForm(int EPSG, int EPGSTo)
+{
+	if (EPSG == 0 || EPGSTo == 0) {
+		transformok = false;
+	}
+	if (EPSG == EPGSTo) {
+		transformok = false;
+	}
+
+	OGRSpatialReference *oSourceSRS, *oTargetSRS;
+	oSourceSRS = new OGRSpatialReference();
+	oSourceSRS->importFromEPSG(EPSG);
+	oTargetSRS = new OGRSpatialReference();
+	oTargetSRS->importFromEPSG(EPGSTo);
+	poCT = OGRCreateCoordinateTransformation( oSourceSRS, oTargetSRS );
+
+	if(poCT == NULL)
+	{
+		transformok = false;
+		DM::Logger(DM::Error) << "Unknown transformation to EPSG:" << EPGSTo;
+	}
+}
+
+bool TileMill::transform(double *x, double *y)
+{
+	if(!transformok)
+		return false;
+
+	if( poCT == NULL || !poCT->Transform( 1, x, y ) )
+		return false;
+
+	return true;
 }
 
 

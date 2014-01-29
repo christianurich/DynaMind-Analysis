@@ -4,6 +4,10 @@
 #include <dmmodule.h>
 #include <dmlogger.h>
 
+//gdal
+#include <ogrsf_frmts.h>
+#include <gdal_priv.h>
+
 using namespace DM;
 
 class DM_HELPER_DLL_EXPORT TileMill : public DM::Module
@@ -18,11 +22,22 @@ class DM_HELPER_DLL_EXPORT TileMill : public DM::Module
 	int EPSGCode;
 	std::string folderName;
 
+	int currrentZoomLevel;
+	double centre_x;
+	double centre_y;
+	bool transformok;
+
+	OGRCoordinateTransformation * poCT;
+
     public:
         TileMill();  //Constructor where data and objects for the module are defined
         void init();
         void run(); //Function executed from the Simulation
 		bool createInputDialog();
+		void initTransForm(int EPSG, int EPGSTo);
+		bool transform(double *x, double *y);
+
+
 };
 
 
