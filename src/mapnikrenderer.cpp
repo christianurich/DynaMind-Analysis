@@ -454,8 +454,8 @@ void MapnikRenderer::renderGrid(unsigned dx, unsigned dy, QString filename)
 	double y2 =  total_length_y - this->zoom_level * (dy+1) * total_length_x + y1_extend ;// +  window_extend[1];
 
 	window.init(x1,y1,x2,y2);
-	DM::Logger(DM::Standard) << window[0] << "/" << window[1];
-	DM::Logger(DM::Standard) << window[2] << "/" << window[3];
+	DM::Logger(DM::Debug) << window[0] << "/" << window[1];
+	DM::Logger(DM::Debug) << window[2] << "/" << window[3];
 	map_->zoom_to_box(window);
 	image_32 buf(map_->width(),map_->height());
 	agg_renderer<image_32> ren(*map_,buf);
