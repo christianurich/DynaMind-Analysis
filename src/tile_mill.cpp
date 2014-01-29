@@ -175,6 +175,7 @@ bool TileMill::createInputDialog() {
 
 void TileMill::initTransForm(int EPSG, int EPGSTo)
 {
+	transformok = true;
 	if (EPSG == 0 || EPGSTo == 0) {
 		transformok = false;
 	}
