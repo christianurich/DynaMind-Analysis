@@ -4,7 +4,7 @@
 #include <guitillmill.h>
 
 #include <cmath>
-
+#include <dmgroup.h>
 #include <dmsystem.h>
 #include <mapnikrenderer.h>
 
@@ -58,6 +58,15 @@ void TileMill::init()
 
 
 void TileMill::run() {
+
+	Group* lg = dynamic_cast<Group*>(getOwner());
+	if(lg) {
+		global_counter = lg->getGroupCounter();
+	}
+	else
+	{
+		global_counter = 0;
+	}
 	Logger(Debug) << "Run TileMill";
 	//EPSG 900913
 	double x1_extend = -20037508.342789244;
@@ -68,7 +77,6 @@ void TileMill::run() {
 	double total_length_x = x2_extend - x1_extend;
 	double total_length_y = y2_extend - y1_extend;
 
-	global_counter++;
 	DM::System * sys = this->getData("data");
 	Logger(Debug) << "Init TileMill";
 	MapnikRenderer tilemill = MapnikRenderer(sys, this->EPSGCode, 900913);
@@ -99,21 +107,21 @@ void TileMill::run() {
 	rootdir =rootdir + "/"+QString::number(global_counter);
 	root.mkdir(rootdir);
 
-	Logger(Standard) << tilemill.getMapExtend()[0] << "/" << tilemill.getMapExtend()[1];
-	Logger(Standard) << tilemill.getMapExtend()[2] << "/" << tilemill.getMapExtend()[3];
+	Logger(Debug) << tilemill.getMapExtend()[0] << "/" << tilemill.getMapExtend()[1];
+	Logger(Debug) << tilemill.getMapExtend()[2] << "/" << tilemill.getMapExtend()[3];
 
 	int minzoomlevel = log2( total_length_x / (tilemill.getMapExtend()[2] - tilemill.getMapExtend()[0]) );
-	Logger(Standard) << minzoomlevel;
+	Logger(Debug) << minzoomlevel;
 
 	//for WGS84
 	for (int zoomlevel = minzoomlevel; zoomlevel < minzoomlevel + this->maxZoomLevel ; zoomlevel++) {
 		int elements = pow(2,zoomlevel);
-		Logger(Standard) << elements;
+		Logger(Debug) << elements;
 		QString z_dir = rootdir + "/"+ QString::number(zoomlevel);
 		root.mkdir(z_dir);
 		int total_x =  (tilemill.getMapExtend()[2]  - tilemill.getMapExtend()[0])/total_length_x * elements + 2;
 		int total_y =  (tilemill.getMapExtend()[3]  - tilemill.getMapExtend()[1])/total_length_y * elements + 2;
-		Logger(Standard) << total_x <<"/" << total_y;
+		Logger(Debug) << total_x <<"/" << total_y;
 		int offest_x = ( tilemill.getMapExtend()[0] -  x1_extend ) / total_length_x  * elements;
 		int offest_y = ( -tilemill.getMapExtend()[1] - y1_extend ) / total_length_y  * elements;
 		for ( int dx = 0; dx < (total_x); dx++ ) {
