@@ -46,6 +46,29 @@ std::string DMSystemGeoJSON::ViewToGeoJSON(DM::System *sys, const DM::View &view
 			first = false;
 		featureCollection << "\t\t\{\n";
 		featureCollection << "\t\t\"type\": \"Feature\",\n";
+		//Write Properties
+		featureCollection << "\t\t \"properties\":";
+		 std::map<std::string, DM::Attribute*> attr_map = cmp->getAllAttributes();
+		 featureCollection << "\t\t{";
+		 for (std::map<std::string, DM::Attribute*>::const_iterator it = attr_map.begin();
+			  it != attr_map.end(); it++) {
+
+				featureCollection << "\"" << 	it->first << "\"" << ":";
+				DM::Attribute * attr = it->second;
+				switch (attr->getType()) {
+				case DM::Attribute::STRING:
+					featureCollection << "\"" << attr->getString() << "\"";
+					break;
+				case DM::Attribute::DOUBLE:
+					featureCollection << "\"" << attr->getDouble() << "\"";
+					break;
+				default:
+					featureCollection << "\" not defined \"";
+				}
+
+				featureCollection<<  "\t\t,\n";
+		 }
+		 featureCollection<<  "\t\t},\n";
 		//Write Geometry
 		switch (view.getType()) {
 		case DM::FACE:
