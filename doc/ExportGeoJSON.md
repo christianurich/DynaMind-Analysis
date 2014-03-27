@@ -12,6 +12,7 @@ Exports vector data as geojson file
 | FileName   | STRING | Folder in which the data are stored |
 
 ##Datastream
+###Portname data
 |     Identifier    |     Attribute    |      Type             |Access |    Description    |
 |-------------------|------------------|-----------------------|-------|-------------------|
 | ViewName | 		all			| FACE; |  read | currently only faces are supported |
