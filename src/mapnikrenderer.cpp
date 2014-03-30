@@ -383,19 +383,12 @@ void MapnikRenderer::saveToPicture(unsigned width, unsigned height, QString file
 	if (!sys_)
 		return;
 	//map_->zoom_to_box();
+
 	map_->set_width(width);
 	map_->set_height(height);
-	mapnik::box2d<double> window;
+	map_->zoom_all();
+	map_->zoom(1.1);
 
-	double x1 = 0;
-	double y1 = 0;
-	double x2 = 1000;
-	double y2 = 1000;
-
-	window.init(x1,y1,x2,y2);
-	//map_->pan(pan.x(), pan.y());
-	//map_->zoom(this->zoom_level);
-	map_->zoom_to_box(window);
 	image_32 buf(map_->width(),map_->height());
 	agg_renderer<image_32> ren(*map_,buf);
 	ren.apply();
