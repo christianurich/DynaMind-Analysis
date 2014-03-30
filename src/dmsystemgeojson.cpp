@@ -52,6 +52,9 @@ std::string DMSystemGeoJSON::ViewToGeoJSON(DM::System *sys, const DM::View &view
 		 featureCollection << "\t\t{";
 		 for (std::map<std::string, DM::Attribute*>::const_iterator it = attr_map.begin();
 			  it != attr_map.end(); it++) {
+				if (it != attr_map.begin()) {
+					featureCollection<<  "\t\t,\n";
+				}
 
 				featureCollection << "\"" << 	it->first << "\"" << ":";
 				DM::Attribute * attr = it->second;
@@ -66,7 +69,7 @@ std::string DMSystemGeoJSON::ViewToGeoJSON(DM::System *sys, const DM::View &view
 					featureCollection << "\" not defined \"";
 				}
 
-				featureCollection<<  "\t\t,\n";
+
 		 }
 		 featureCollection<<  "\t\t},\n";
 		//Write Geometry
