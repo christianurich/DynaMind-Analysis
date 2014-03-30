@@ -17,6 +17,14 @@ ExportGeoJSON::ExportGeoJSON()
 	this->FileName = "";
 	this->addParameter("FileName", DM::STRING, &this->FileName);
 	std::vector<DM::View> datastream;
+
+	jsVaraibleName = "test_json";
+	this->addParameter("jsVaraibleName", DM::STRING, &this->jsVaraibleName);
+
+	asVariable = true;
+	this->addParameter("asVariable", DM::BOOL, &this->asVariable);
+
+
 	datastream.push_back(DM::View("dummy", DM::SUBSYSTEM, DM::READ));
 	this->addData("data",datastream);
 }
@@ -31,7 +39,9 @@ void ExportGeoJSON::run()
 	//Logger(Standard)
 	std::fstream txtout;
 	txtout.open(FileName.c_str(),std::ios::out);
-	txtout << "var test_json = ";
+	if (asVariable)
+		txtout << "var " << jsVaraibleName << " = ";
+
 	txtout << geoJSON.ViewToGeoJSON(sys, vName);
 	txtout.close();
 

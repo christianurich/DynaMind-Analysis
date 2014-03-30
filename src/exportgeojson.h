@@ -13,6 +13,8 @@ private:
 	DM::View vName;
 	int EPSGCode;
 	std::string FileName;
+	std::string jsVaraibleName;
+	bool asVariable;
 
 
 public:
