@@ -127,6 +127,7 @@ void TileMill::run() {
 	//
 	this->initTransForm(900913,4326);
 
+	//Calcuate Extend
 	double x1 = tilemill.getMapExtend()[0];
 	double y1 = tilemill.getMapExtend()[1];
 	double x2 = tilemill.getMapExtend()[2];
@@ -138,6 +139,7 @@ void TileMill::run() {
 	Logger(Debug) << x1 << "/" << x2;
 	Logger(Debug) << y1 << "/" << y2;
 
+	//Set Centre
 	this->centre_x = x1 + (x2-x1) / 2.;
 	this->centre_y = y1 + (y2-y1) / 2.;
 
