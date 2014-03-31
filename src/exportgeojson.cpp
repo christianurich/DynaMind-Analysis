@@ -43,6 +43,11 @@ void ExportGeoJSON::run()
 		txtout << "var " << jsVaraibleName << " = ";
 
 	txtout << geoJSON.ViewToGeoJSON(sys, vName);
+
+	if (asVariable)
+		txtout << ";";
+	txtout << "\n";
+
 	txtout.close();
 
 }

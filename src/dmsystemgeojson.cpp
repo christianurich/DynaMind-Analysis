@@ -89,7 +89,7 @@ std::string DMSystemGeoJSON::ViewToGeoJSON(DM::System *sys, const DM::View &view
 	}
 	featureCollection << "\n";
 	featureCollection << "\t\t]\n";
-	featureCollection << "};\n";
+	featureCollection << "}";
 	return featureCollection.str();
 }
 
