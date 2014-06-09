@@ -89,7 +89,7 @@ void TileMill::run() {
 
 	DM::System * sys = this->getData("data");
 	Logger(Debug) << "Init TileMill";
-    MapnikRenderer tilemill = MapnikRenderer(sys, this->EPSGCode, 3856);
+    MapnikRenderer tilemill = MapnikRenderer(sys, this->EPSGCode, 900913);
 	Logger(Debug) << "Init TileMill Successful";
 	for (std::map<std::string, std::string>::const_iterator it = exportMaps.begin();
 		 it != exportMaps.end();
@@ -125,7 +125,7 @@ void TileMill::run() {
 	this->currrentZoomLevel = minzoomlevel;
 
 	//
-    this->initTransForm(3856,4326);
+    this->initTransForm(900913,4326);
 
 	//Calcuate Extend
 	double x1 = tilemill.getMapExtend()[0];
