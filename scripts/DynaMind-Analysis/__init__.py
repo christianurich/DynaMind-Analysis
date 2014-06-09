@@ -21,3 +21,4 @@
 """
 
 from viewtothreejs import *
+from addbox import *
