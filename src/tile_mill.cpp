@@ -89,7 +89,7 @@ void TileMill::run() {
 
 	DM::System * sys = this->getData("data");
 	Logger(Debug) << "Init TileMill";
-	MapnikRenderer tilemill = MapnikRenderer(sys, this->EPSGCode, 900913);
+    MapnikRenderer tilemill = MapnikRenderer(sys, this->EPSGCode, 3856);
 	Logger(Debug) << "Init TileMill Successful";
 	for (std::map<std::string, std::string>::const_iterator it = exportMaps.begin();
 		 it != exportMaps.end();
@@ -125,7 +125,7 @@ void TileMill::run() {
 	this->currrentZoomLevel = minzoomlevel;
 
 	//
-	this->initTransForm(900913,4326);
+    this->initTransForm(3856,4326);
 
 	//Calcuate Extend
 	double x1 = tilemill.getMapExtend()[0];
@@ -144,7 +144,7 @@ void TileMill::run() {
 	this->centre_y = y1 + (y2-y1) / 2.;
 
 	for (int zoomlevel = minzoomlevel; zoomlevel < minzoomlevel + this->maxZoomLevel ; zoomlevel++) {
-		int elements = pow(2,zoomlevel);
+        int elements = pow(2.0f,zoomlevel);
 		Logger(Debug) << elements;
 		QString z_dir = rootdir + "/"+ QString::number(zoomlevel);
 		root.mkdir(z_dir);

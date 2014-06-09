@@ -78,7 +78,7 @@ void CreateSnapshot::run() {
 	//EPSG 900913
 	DM::System * sys = this->getData("data");
 	Logger(Debug) << "Init TileMill";
-	MapnikRenderer tilemill = MapnikRenderer(sys, this->EPSGCode, 900913);
+    MapnikRenderer tilemill = MapnikRenderer(sys, this->EPSGCode, 3856);
 	Logger(Debug) << "Init TileMill Successful";
 	for (std::map<std::string, std::string>::const_iterator it = exportMaps.begin();
 		 it != exportMaps.end();
@@ -97,7 +97,7 @@ void CreateSnapshot::run() {
 
 	filename =filename +".png";
 
-	this->initTransForm(900913,4326);
+    this->initTransForm(3856,4326);
 	Logger(DM::Debug) << "Export to" << filename.toStdString();
 	tilemill.saveToPicture(this->width,this->height,filename);
 }
